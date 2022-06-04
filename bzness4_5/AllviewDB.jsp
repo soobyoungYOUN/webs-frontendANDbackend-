@@ -30,6 +30,7 @@
 	int startPage = 0; //하단에 표시될 첫 페이지
 	int finalPage = (endData / 10) + 1; //출력될 최대 페이지의 수를 제한
 	
+	// 데이터의 따라 마지막 여주는 페이지를 출력하는 
 	if (endData % 10 == 0){
 		finalPage = (endData / 10);
 	}
@@ -38,6 +39,7 @@
 		// tempFinalPage = finalPage;
 	// }
 	
+	// 현재 페이지를 받아오는 코드
 	String getFrom = request.getParameter("from"); //페이지의 번호를 받아옴
 	if (getFrom == null || "null".equals(getFrom)){
 		nowPage = 0;
@@ -45,6 +47,7 @@
 		nowPage = Integer.parseInt(getFrom) - 1;
 	}
 	
+	// 현재 페이지의 범위를 조정하는 코드
 	if (nowPage < 0){
 		nowPage = 0;
 	} else if (nowPage > finalPage) {

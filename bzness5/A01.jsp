@@ -9,16 +9,17 @@
 </style> 
 		
 <title>후보등록 A01.jsp</title>
-<%!
+<%! // 후보자 등록을 하는 메소드
 	public String huboList(int kiho, String name){
 		String query = "<tr><td><form method='post' action='A02.jsp'>기호: <input type='number' name='id' value='" + kiho + 
-						"'readonly>이름: <input type='text' name='name' pattern='[가-힣a-zA-Z]{2,10}' title='한글,영어 2~10자로 입력해주세요' value='" + name + "'><input type='submit' value='삭제'></form></td></tr>";
+						"'readonly>이름: <input type='text' name='name' pattern='[가-힣a-zA-Z]{2,10}' title='한글,영어 2~10자로 입력해주세요'	value='" + name
+						+ "'><input type='submit' value='삭제'></form></td></tr>";
 		return query;
 	}
 %>
 </head>
 <body>
-<%
+<% // 후보자 DB에 접속
 	Class.forName("com.mysql.jdbc.Driver");
 	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/kopoctc","root","kopo26");
 	Statement stmt = conn.createStatement();
@@ -33,7 +34,7 @@
 </table>
 
 <table cellspacing=3 width=600 border=1>
-	<%
+	<% //DB에서 후보자 정보를 찾아오는 코드
 		while(rset.next()){
 			out.print(huboList(rset.getInt(1), rset.getString(2)));
 		}
@@ -46,7 +47,9 @@
 	<tr>
 		<td>
 			<form method='get' action='A03.jsp'>
-				기호: <input type='number' name='id' value='<%=number%>' readonly>이름: <input type='text' pattern="[가-힣a-zA-Z]{2,10}" title='한글,영어 2~10자로 입력해주세요' name='name' value=''><input type='submit' value='추가' bgcolor='#ff00ff'>
+				기호: <input type='number' name='id' value='<%=number%>' readonly>이름: 
+				<input type='text' pattern="[가-힣a-zA-Z]{2,10}" title='한글,영어 2~10자로 입력해주세요' name='name' value=''>
+				<input type='submit' value='추가' bgcolor='#ff00ff'>
 			</form>
 		</td>
 	</tr>

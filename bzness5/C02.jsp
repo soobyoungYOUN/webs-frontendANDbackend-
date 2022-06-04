@@ -11,7 +11,8 @@
 <%!	
 	public String tupyoList(int kiho, String image, int vote, int totalVote){						
 		String query = "<tr><td width=75><p align=center>"+ (kiho * 10) + "대</a></p></td>" +
-						"<td width=500><p align=left><img src='" + image + "' width='"+ vote +"' height=20>" + vote + "(" + (int)(vote * 100 / totalVote ) +"%)</p></td></tr>";
+						"<td width=500><p align=left><img src='" + image + "' width='"+ vote +"' height=20>" + vote + 
+							"(" + (int)(vote * 100 / totalVote ) +"%)</p></td></tr>";
 		return query;
 	}
 %>
@@ -35,6 +36,11 @@
 	int totalVote = 0;
 	while(rsetTupyo.next()){
 		totalVote = rsetTupyo.getInt(1);
+	}
+	
+	// 한 표도 못 받을 경우에 0으로 나눌 수 없으므로 0 대신 1 부여
+	if (totalVote == 0){
+		totalVote = 1;
 	}
 	
 	//한 후보자의 세대별 득표 분포를 출력

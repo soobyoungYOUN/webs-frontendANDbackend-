@@ -13,27 +13,38 @@
 	Class.forName("com.mysql.jdbc.Driver");
 	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/kopoctc", "root", "kopo26");
 	Statement stmt = conn.createStatement();
-		
-	ResultSet rsetMin = stmt.executeQuery("select min(studentid) from bzness_examtable"); //학번중 가장 작은 번호 찾기
+	
 	//입력할 학번과 탐색할 학번 설정
 	int minId = 0;
+	int maxId = 0;
 	int newStdId = 0;
+
+	//학번중 가장 작은 번호 찾기
+	ResultSet rsetMin = stmt.executeQuery("select min(studentid) from bzness_examtable"); 
+	
 	//최저학번 받아오기
 	while(rsetMin.next()){
 		minId = rsetMin.getInt(1);
 	}
-	if (minId == 0){
-	newStdId = 209901;
+
+	// 최저 학번의 번호가 209901이 아니라면 newStdId = 209901
+	if (minId < 209901) {
+		minId = 209901;
+		newStdId = 209901;
+	} else {
+		//전체학번 조회
+		newStdId = 209901;
+		ResultSet rset = stmt.executeQuery("select studentid from bzness_examtable"); 
+		//전체 학번을 조회하고 그 중에 비어있는 학번을 부여
+		while(rset.next()){ 
+			if (newStdId != rset.getInt(1)){
+				break;
+			} 
+			newStdId++;
+		}
 	}
+
 	
-	ResultSet rset = stmt.executeQuery("select studentid from bzness_examtable"); //전체학번 조회
-	//전체 학번을 조회하고 그 중에 비어있는 학번을 부여
-	while(rset.next()){ 
-		if (newStdId != rset.getInt(1)){
-			break;
-		} 
-		newStdId++;
-	}
 	
 	//html 주소로부터 name 변수의 값을 받아옴
 	String cTmp = request.getParameter("name");

@@ -17,7 +17,10 @@
 	
 	String num = request.getParameter("id");
 	String query = String.format("delete from hubo_table where id=" + num + ";");
+	stmt.execute(query);
 
+	// 후보자를 삭제하면 후보자의 표도 사라짐
+	query = String.format("delete from tupyo_table where id=" + num + ";");
 	stmt.execute(query);
 %>
 

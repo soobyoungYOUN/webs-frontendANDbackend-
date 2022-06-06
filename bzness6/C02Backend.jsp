@@ -22,6 +22,10 @@
 	while(rsetTupyo.next()){
 		totalVote = rsetTupyo.getInt(1);
 	}
+
+	if (totalVote == 0){
+		totalVote = 1;
+	}
 	
 	ResultSet rsetHubo = stmt.executeQuery("select name from hubo_table where id= " + id + ";");
 	String huboName = "";

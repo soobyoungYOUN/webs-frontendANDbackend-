@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <%@ page contentType="text/xml; charset=utf-8"%>
 <%@ page import="java.sql.*,javax.sql.*,java.io.*,java.net.*"%>
+<!-- 문서 인코딩 방식 및 자바 활용을 위한 import -->
 <html>
 <head>
 <title>C01</title>
 </head>
 <body>
 <%
+	// 원격으로 db에 접근
 	Class.forName("com.mysql.jdbc.Driver");
 	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/kopoctc","root","kopo26");
 	Statement stmt = conn.createStatement();
 	ResultSet rsetTupyo = stmt.executeQuery("select count(*) from tupyo_table;");
 	
-	//전체 투표자의 수 
+	// 전체 투표자의 수 
 	int totalVote = 0;
 	while(rsetTupyo.next()){
 		totalVote = rsetTupyo.getInt(1);
 	}
 	
-	//전체 후보자 수
+	// 전체 후보자 수
 	int totalHubo = 0;
 	ResultSet rsetHubo = stmt.executeQuery("select count(*) from hubo_table;");
 	while(rsetHubo.next()){
 		totalHubo=rsetHubo.getInt(1);
 	}
-	//각 후보자의 득표 수를 저장하기 위한 배열
+	// 각 후보자의 득표 수를 저장하기 위한 배열
 	int[] votePer = new int[totalHubo];
 	
-	//배열에 후보자 별 득표 입력
+	// 배열에 후보자 별 득표 입력
 	int index1 = 0;
 	ResultSet rsetVote = stmt.executeQuery("select count(id) from tupyo_table group by id;");
 	while(rsetVote.next()){
@@ -35,8 +37,10 @@
 		index1++;
 	}
 	
+	// 전체 후보자의 수를 계산
 	ResultSet rset = stmt.executeQuery("select * from hubo_table;");
 
+	// 데이터 태그의 하위 태그를 생성하고 값 db 값을 입력
 	int index2 = 0;
 	out.println("<datas>");
 	while(rset.next()){

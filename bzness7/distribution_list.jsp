@@ -44,72 +44,59 @@
       registeredDates.add(rs.getString(5));
     }
 
-    int start = ids.size();
-    int breakPoint = 0;
+    // 전체 데이터의 수를 구한다
+    // 한 페이지에 출력할 데이터의 수 = 20;
+    // 현재 페이지의 번호
+    int standard = 20;
+    int endData = ids.size(); // 전체 데이터의 수
+    int lastPage = endData / standard; // 마지막 페이지의 넘버
+    if (endData % standard != 0) {  // 나머지 데이터를 출력하기 위한 페이지
+      lastPage = lastPage + 1;
+    }
+
+    // 현재 페이지를 받아오는 코드
+    String getPage = request.getParameter("page"); //페이지의 번호를 받아옴
+    int nowPage = 0;
+    if (getPage == null || "null".equals(getPage)){
+      nowPage = 0;
+    } else {
+      nowPage = Integer.parseInt(getPage) - 1;
+    }
+
+    // 현재 페이지의 범위를 조정하는 코드
+    if (nowPage < 0){
+      nowPage = 0;
+    } else if (nowPage > lastPage) {
+      nowPage = lastPage - 1;
+    }
+
     String query ="";
-    for (int i = 0; i < start; i++) {
+    for (int i = nowPage * standard; i < (nowPage + 1) * standard; i++) {
       out.println("<tr>");
-      query = "<td width=50><p align=center><a href='distribution_view.jsp?key=" + (i+1) + "'>" + 
+      query = "<td width=50><p align=center><a href='distribution_view.jsp?key=" + ids.get(i) + "'>" + 
                 ids.get(i).toString() + "</a></p></td>" + 
-              "<td width=100><p align=center><a href='distribution_view.jsp?key=" + (i+1) + "'>" + 
+              "<td width=100><p align=center><a href='distribution_view.jsp?key=" + ids.get(i) + "'>" + 
                 names.get(i).toString() + "</a></p></td>" + 
               "<td width=100><p align=center>" + counts.get(i).toString() + "</p></td>" +
               "<td width=100><p align=center>" + countingDates.get(i).toString() + "</p></td>" +
               "<td width=100><p align=center>" + registeredDates.get(i).toString() + "</p></td>";
       out.print(query);
       out.println("</tr>");
-      breakPoint++;
-      if (breakPoint == 19) break;
     }
-    int endData = ids.size();
+
     %>
   </table>
   <table width="600" align="center">
   <%
-    //데이터의 수에 따라 출력할 최종 페이지의 수를 결정
-    int nowPage = 0;	//화면에 보여줄 현재 페이지
-    int printData = 10; //출력할 데이터의 수
-    int firstData = 0;	//페이지에 출력될 처음 데이터
-    int startPage = 0; //하단에 표시될 첫 페이지
-    int finalPage = (endData / 10) + 1; //출력될 최대 페이지의 수를 제한
-    
-    // 데이터의 따라 마지막 여주는 페이지를 출력하는 
-    if (endData % 10 == 0){
-      finalPage = (endData / 10);
-    }
-    
-    // if (finalPage < 11) {
-      // tempFinalPage = finalPage;
-    // }
-    
-    // 현재 페이지를 받아오는 코드
-    String getFrom = request.getParameter("from"); //페이지의 번호를 받아옴
-    if (getFrom == null || "null".equals(getFrom)){
-      nowPage = 0;
-    } else {
-      nowPage = Integer.parseInt(getFrom) - 1;
-    }
-    
-    // 현재 페이지의 범위를 조정하는 코드
-    if (nowPage < 0){
-      nowPage = 0;
-    } else if (nowPage > finalPage) {
-      nowPage = 0;
-    }
-    if (nowPage > finalPage){
-      nowPage = finalPage - 1;
-    }
-    
-    startPage = nowPage / 10 + 1; //하단에 표시될 첫 페이지 목록
-    firstData = nowPage * printData; //현재 페이지에서 출력할 첫번째 데이터의 번호
+    int startPage = nowPage / 10 + 1; //하단에 표시될 첫 페이지 목록
 
-    out.println("<tr><td width=50 align=center><b><a href='distribution_list.jsp?from=" + (int)(Math.floor(startPage/10)*10 -1) + "'>&lt&lt</a></b></td>");
+    out.println("<tr><td width=50 align=center><b><a href='distribution_list.jsp?page=" + (nowPage + 1) + "'>&lt&lt</a></b></td>");
     String sqlPage = "";
-    for (int i = startPage; i <= finalPage; i++){
-      sqlPage = "<td width=50 align=center><b><a href='distribution_list.jsp?from=" + i + "'>"+ i +"</a></b></td>";
+    for (int i = startPage; i <= 10; i++){
+      sqlPage = "<td width=50 align=center><b><a href='distribution_list.jsp?page=" + i + "'>"+ i +"</a></b></td>";
       out.println(sqlPage);
     }
-    out.println("<td width=50 align=center><b><a href='distribution_list.jsp?from=" + (int)((Math.ceil(startPage/10) +1)*10) + "'>&gt&gt</a></b></td>");
+    out.println("<td width=50 align=center><b><a href='distribution_list.jsp?page=" + ((nowPage + 1) * 10) + "'>&gt&gt</a></b></td>");
 	%>
       <td align="right"><input type="button" value="신규등록" onclick="window.location='distribution_insert.jsp'"></td>
     </tr>

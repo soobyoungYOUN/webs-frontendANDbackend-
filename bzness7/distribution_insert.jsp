@@ -22,15 +22,15 @@
       <table width='650' border="1" cellspacing="0" cellpadding="5">
         <tr>
           <td><b>상품 번호</b></td>
-          <td><input type="number" name="id" size="70" maxlength="70" value=<%=id%>></td>
+          <td><input type="number" name="id" size="70" maxlength="70"></td>
         </tr>
         <tr>
           <td><b>상품명</b></td>
-          <td><input type="text" name="name" size="70" maxlength="70" value=<%=name%>></td>
+          <td><input type="text" name="name" size="70" maxlength="70"></td>
         </tr>
         <tr>
           <td><b>재고 현황</b></td>
-          <td><input type="number" name="count" size="70" maxlength="70" value=<%=count%>></td>
+          <td><input type="number" name="count" size="70" maxlength="70"></td>
         </tr>
         <tr>
           <td><b>상품등록일</b></td>
@@ -42,19 +42,19 @@
         </tr>
         <tr>
           <td><b>상품설명</b></td>
-          <td><input type="text" name="discription" size="70" maxlength="70" value=<%=discription%>></td>
+          <td><input type="text" name="discription" size="70" maxlength="70"></td>
         </tr>
         <tr>
           <td><b>상품사진</b></td>
-          <td><input type="file" name="fileName"></td>
+          <td><input type="file" name="upoladFile"></td>
         </tr>
       </table>
+    </form>
       <table width="650">
         <tr>
           <td width="600"></td>
           <td><input type="button" value="등록" onclick="submitForm('write')"></td>
         </tr>
       </table>
-    </form>  
   </body>
 </html>

@@ -71,7 +71,12 @@
     }
 
     String query ="";
-    for (int i = nowPage * standard; i < (nowPage + 1) * standard; i++) {
+    int printEndData = (nowPage + 1) * standard;
+    if (printEndData >= endData) {
+      printEndData = endData;
+    }
+
+    for (int i = nowPage * standard; i < printEndData; i++) {
       out.println("<tr>");
       query = "<td width=50><p align=center><a href='distribution_view.jsp?key=" + ids.get(i) + "'>" + 
                 ids.get(i).toString() + "</a></p></td>" + 
@@ -92,7 +97,7 @@
 
     out.println("<tr><td width=50 align=center><b><a href='distribution_list.jsp?page=" + (nowPage + 1) + "'>&lt&lt</a></b></td>");
     String sqlPage = "";
-    for (int i = startPage; i <= 10; i++){
+    for (int i = startPage; i <= lastPage; i++){
       sqlPage = "<td width=50 align=center><b><a href='distribution_list.jsp?page=" + i + "'>"+ i +"</a></b></td>";
       out.println(sqlPage);
     }

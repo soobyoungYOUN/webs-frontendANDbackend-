@@ -25,7 +25,7 @@
       String which = request.getParameter("key");
       String sql="";
       if ("INSERT".equals(which)){
-        sql = "insert into gongji(title,date,content) values('"+title+"',date(now()),'"+content+"')"; 
+        sql = "insert into gongji(title,date,content) values('" + title + "', date(now()), '" + content + "')"; 
       } else {
         sql = "update gongji set title = '" + request.getParameter("title") + "', content ='" + request.getParameter("content") + "' where id ='" + request.getParameter("id") + "';";
       }

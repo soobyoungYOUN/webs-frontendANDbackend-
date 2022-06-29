@@ -3,7 +3,7 @@
 <%@ page import="java.sql.*,javax.sql.*,java.io.*,java.net.*,org. w3c.dom.*,
       javax.xml.parsers.DocumentBuilder,javax.xml.parsers.DocumentBuilderFactory,
       javax.xml.parsers.ParserConfigurationException,
-      java.util.List, java.util.ArrayList"%>
+      java.util.List, java.util.ArrayList, java.util.Date, java.text.SimpleDateFormat"%>
 <html>
 <head>
 </head>
@@ -12,88 +12,117 @@
     <tr>
       <td width="50"><p align="center">번호</p></td>
       <td width="500"><p align="center">제목</p></td>
+      <td width="100"><p align="center">조회수</p></td>
       <td width="100"><p align="center">등록일</p></td>
     </tr>
   
 	<%
-		// 공지 리스트 접근
-    List<Integer> ids = new ArrayList();
-    List<String> titles = new ArrayList();
-    List<String> dates = new ArrayList();
-    List<String> contents = new ArrayList();
+    // 현재 페이지를 받아오는 코드
+    String getPage = request.getParameter("page"); //페이지의 번호를 받아옴
+    String moved = request.getParameter("move"); // 꺽쇠 이동 여부 확인
 
+    int nowPage = 0;                      // 현재 페이지 변수
+    int showingPageStandard = 10;         // 출력할 페이지의 수
+    int standard = 10;                    // 한 페이지에 출력할 데이터의 수
+
+    if (getPage == null || "null".equals(getPage)){
+      nowPage = 1;
+    } else {
+      nowPage = Integer.parseInt(getPage);
+    }
+
+    // 꺽쇠 이동 여부에 대한 반응
+    if (moved == "left") {
+      nowPage = Integer.parseInt(getPage) / showingPageStandard * showingPageStandard + 1;
+    } else if (moved == "right") {
+      nowPage = Integer.parseInt(getPage) / showingPageStandard * showingPageStandard + 1;
+    }
+    
+    // 현재 페이지에서 출력할 첫 데이터의 id
+    int firstData = (nowPage - 1) * standard;
+    if ((nowPage <= 1)) {
+      firstData = 0;
+    } 
+
+		// 공지 리스트 접근
     Class.forName("com.mysql.jdbc.Driver");
     Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/kopoctc","root","kopo26");
     Statement stmt = conn.createStatement();
-    ResultSet rs = stmt.executeQuery("select * from gongji");
+    ResultSet rs = stmt.executeQuery("select id, title, date, recnt, viewcnt from gongji order by id desc, recnt asc limit " + firstData + ", " + standard + ";");
     
-    while (rs.next()) {
-      ids.add(rs.getInt(1));
-      titles.add(rs.getString(2));
-      dates.add(rs.getString(3));
-      contents.add(rs.getString(4));
-    }
+    // 새글 확인을 위한 표시
+    Date dateM = new Date();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    String today = sdf.format(dateM);
 
-    int start = ids.size();
-    int breakPoint = 0;
-    String query ="";
-    for (int i = start-1; i >= 0; i--) {
+    // 데이터를 웹 페이지에 출력
+    int id = 0;
+    String title = "";
+    int viewCount = 0;
+    String date = "";
+    String query = "";
+    while (rs.next()) {
+      id = rs.getInt(1);
+      date = rs.getString(3);
+      title = rs.getString(2);
+      if (today.equals(date)) {
+        title = title + "[new]";
+      }
+      viewCount = rs.getInt(5);
+      
+
       out.println("<tr>");
-      query = "<td width=50><p align=center>" + ids.get(i).toString() + "</p></td>" + 
-              "<td width=500><p align=center><a href='gongji_view.jsp?key=" + (i+1) + "'>" + 
-                titles.get(i).toString() + "</a></p></td>" + 
-              "<td width=100><p align=center>" + dates.get(i).toString() + "</p></td>";
+      query = "<td width=50><p align=center>" + id + "</p></td>" + 
+              "<td width=500><p align=center><a href='gongji_view.jsp?key=" + id + "'>" + 
+                title + "</a></p></td>" + 
+              "<td width=100><p align=center>" + viewCount + "</p></td>" + 
+              "<td width=100><p align=center>" + date + "</p></td>";
       out.print(query);
       out.println("</tr>");
-      breakPoint++;
-      if (breakPoint == 9) break;
     }
-    int endData = ids.size();
+    out.print("</table>");
 
-    //데이터의 수에 따라 출력할 최종 페이지의 수를 결정
-    int nowPage = 0;	//화면에 보여줄 현재 페이지
-    int printData = 10; //출력할 데이터의 수
-    int firstData = 0;	//페이지에 출력될 처음 데이터
-    int startPage = 0; //하단에 표시될 첫 페이지
-    int finalPage = (endData / 10) + 1; //출력될 최대 페이지의 수를 제한
-    
-    // 데이터의 따라 마지막 여주는 페이지를 출력하는 
-    if (endData % 10 == 0){
-      finalPage = (endData / 10);
+    // 하단의 페이지 표시를 위한 코드
+    // 최대 데이터의 수
+    rs = stmt.executeQuery("select count(*) from gongji;");
+    int endData = 0;
+    while (rs.next()){
+      endData = rs.getInt(1);
     }
-    
-    // if (finalPage < 11) {
-      // tempFinalPage = finalPage;
-    // }
-    
-    // 현재 페이지를 받아오는 코드
-    String getFrom = request.getParameter("from"); //페이지의 번호를 받아옴
-    if (getFrom == null || "null".equals(getFrom)){
-      nowPage = 0;
-    } else {
-      nowPage = Integer.parseInt(getFrom) - 1;
-    }
-    
-    // 현재 페이지의 범위를 조정하는 코드
-    if (nowPage < 0){
-      nowPage = 0;
-    } else if (nowPage > finalPage) {
-      nowPage = 0;
-    }
-    if (nowPage > finalPage){
-      nowPage = finalPage - 1;
-    }
-    
-    startPage = nowPage / 10 + 1; //하단에 표시될 첫 페이지 목록
-    firstData = nowPage * printData; //현재 페이지에서 출력할 첫번째 데이터의 번호
 
-    out.println("<tr><td width=50 align=center><b><a href='gongji_list.jsp?from=" + (int)(Math.floor(startPage/10)*10 -1) + "'>&lt&lt</a></b></td>");
+    // 데이터의 수에 따라 출력할 최종 페이지의 수를 결정
+    int lastPage = (int) Math.ceil((double) endData / standard);
+    int showingFirstPage = (nowPage / showingPageStandard) * showingPageStandard + 1;     // 출력될 첫 페이지의 번호
+    if (nowPage % showingPageStandard == 0) {                               // 10페이지를 클릭하면 하단에 출력되는 페이지가 달라지는 걸 방지
+      showingFirstPage = showingFirstPage - showingPageStandard;
+    }
+    
+    int showingLastPage = showingFirstPage + showingPageStandard - 1;      // 출력될 마지막 페이지의 번호
+    if (showingLastPage > lastPage) {                                      // 최대 페이지 보다 보여줄 페이지가 크면 최대 페이지 값을 보여줄 페이지로
+      showingLastPage = lastPage;
+    }
+
+    // 꺽쇠를 클릭하면 이동할 페이지
+    int leftMovePage = showingFirstPage - showingPageStandard;
+    if (leftMovePage < 0) {
+      leftMovePage = 1;
+    }
+
+    // 우측으로 이동하면 다음 10개의 페이지 목록중 1번 목록으로 이동하도록 조정
+    int rightMovePage = showingFirstPage + showingPageStandard;
+    if (rightMovePage > lastPage) {
+      rightMovePage = lastPage;
+    }
+
+    out.print("<br>");
+    out.println("<table cellspacing='1' width='600'>");
+    out.println("<tr><td width=50 align=center><b><a href='gongji_list.jsp?page=" + leftMovePage + "&move=left'>&lt&lt</a></b></td>");
     String sqlPage = "";
-    for (int i = startPage; i <= finalPage; i++){
-      sqlPage = "<td width=50 align=center><b><a href='gongji_list.jsp?from=" + i + "'>"+ i +"</a></b></td>";
+    for (int i = showingFirstPage; i <= showingLastPage; i++){
+      sqlPage = "<td width=50 align=center><b><a href='gongji_list.jsp?page=" + i + "'>"+ i +"</a></b></td>";
       out.println(sqlPage);
     }
-    out.println("<td width=50 align=center><b><a href='gongji_list.jsp?from=" + (int)((Math.ceil(startPage/10) +1)*10) + "'>&gt&gt</a></b></td>");
+    out.println("<td width=50 align=center><b><a href='gongji_list.jsp?page=" + rightMovePage + "&move=right'>&gt&gt</a></b></td>");
 	%>
   </table>
   <table width="650">
